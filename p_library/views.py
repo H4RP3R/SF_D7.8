@@ -226,6 +226,7 @@ class CreateUserProfile(FormView):
         if self.request.user.is_authenticated:
             context['username'] = self.request.user.username
             context['bttntxt'] = 'Создать'
+            context['message'] = 'Создать профиль'
         return context
 
 
@@ -239,6 +240,7 @@ class UserProfileUpdate(UpdateView):
         if self.request.user.is_authenticated:
             context['username'] = self.request.user.username
             context['bttntxt'] = 'Редактировать'
+            context['message'] = 'Изменить данные'
         return context
 
     def get_success_url(self):
