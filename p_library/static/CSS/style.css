@@ -65,6 +65,10 @@ li.inner {
     text-decoration: underline;
 }
 
+.user-auth {
+    width: 100%;
+}
+
 .border {
     padding: 20px 40px;
     margin-top: 14px;

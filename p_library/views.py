@@ -7,9 +7,13 @@ from django.urls import reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib import auth
 from django.contrib.auth import login, authenticate
+from allauth.socialaccount.models import SocialAccount
+from django.core.exceptions import ObjectDoesNotExist
+
 
 from p_library.models import Book, Publisher, Author, Friend, UserProfile
-from p_library.forms import AuthorForm, BookForm, FriendForm, FriendEditForm, ProfileCreationForm
+from p_library.forms import AuthorForm, BookForm, FriendForm, FriendEditForm, ProfileCreationForm, \
+    UserProfileUpdateForm
 
 
 def books_list(request):
@@ -76,7 +80,30 @@ def publishers_list(request):
         'publishers': publishers,
         'book_publisher': book_publisher,
     }
+    if request.user.is_authenticated:
+        data['username'] = request.user.username
     return HttpResponse(template.render(data))
+
+
+def user(request, pk):
+
+    data = {
+        'user': request.user,
+        'username': request.user.username,
+    }
+    try:
+        template = loader.get_template('github_user.html')
+        data['extra_data'] = SocialAccount.objects.get(provider='github', user=request.user).extra_data
+        return HttpResponse(template.render(data))
+    except ObjectDoesNotExist:
+        pass
+
+    try:
+        template = loader.get_template('user.html')
+        data['extra_data'] = UserProfile.objects.get(user=request.user)
+        return HttpResponse(template.render(data))
+    except ObjectDoesNotExist:
+        return HttpResponse(template.render(data))
 
 
 class AuthorEdit(CreateView):
@@ -85,10 +112,22 @@ class AuthorEdit(CreateView):
     success_url = reverse_lazy('p_library:author_list')
     template_name = 'author_edit.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
+
 
 class AuthorList(ListView):
     model = Author
     template_name = 'authors_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
 
 
 class BookEdit(CreateView):
@@ -97,10 +136,22 @@ class BookEdit(CreateView):
     success_url = reverse_lazy(index)
     template_name = 'book_edit.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
+
 
 class FriendList(ListView):
     model = Friend
     template_name = 'friends_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
 
 
 class FriendUpdate(UpdateView):
@@ -109,12 +160,24 @@ class FriendUpdate(UpdateView):
     success_url = reverse_lazy('p_library:friend_list')
     template_name = 'friend_update.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
+
 
 class FriendEdit(CreateView):
     model = Friend
     form_class = FriendEditForm
     success_url = reverse_lazy('p_library:friend_list')
     template_name = 'friend_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
 
 
 class BookDetailView(DetailView):
@@ -124,6 +187,8 @@ class BookDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
         return context
 
 
@@ -155,3 +220,26 @@ class CreateUserProfile(FormView):
         instance.user = self.request.user
         instance.save()
         return super(CreateUserProfile, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+            context['bttntxt'] = 'Создать'
+        return context
+
+
+class UserProfileUpdate(UpdateView):
+    model = UserProfile
+    template_name = 'profile-create.html'
+    form_class = UserProfileUpdateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+            context['bttntxt'] = 'Редактировать'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('p_library:user', args=(self.request.user.pk,))

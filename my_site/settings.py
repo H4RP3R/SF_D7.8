@@ -18,6 +18,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGOUT_REDIRECT_URL = reverse_lazy('index')
+ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy('index')
+ACCOUNT_LOGOUT_ON_GET = True
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,7 +32,7 @@ SECRET_KEY = 'gmap(t_6fj_qen&1%24cc0g5_2l6vm2ytidi91dlsou%y0(#mo'
 DEBUG = True
 SITE_ID = 1
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 AUTHENTICATION_BACKENDS = (
@@ -38,6 +40,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 

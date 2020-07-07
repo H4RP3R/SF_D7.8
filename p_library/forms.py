@@ -59,4 +59,11 @@ class ProfileCreationForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['age']
+        exclude = ('uid', 'user',)
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = UserProfile
+        exclude = ('uid', 'user',)

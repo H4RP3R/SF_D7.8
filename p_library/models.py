@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from allauth.socialaccount.models import SocialAccount
+
+import uuid
 
 
 class Author(models.Model):
@@ -60,5 +63,9 @@ class Friend(models.Model):
 
 
 class UserProfile(models.Model):
-    age = models.IntegerField()
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    avatar = models.ImageField(upload_to='avatars/', verbose_name='Аватар')
+    birth_year = models.SmallIntegerField(verbose_name='Год рождения')
+    email = models.EmailField(max_length=254)
+    location=models.CharField(max_length=120, verbose_name='Локация')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
