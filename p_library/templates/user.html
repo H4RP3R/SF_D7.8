@@ -27,9 +27,15 @@
                 </span>
             </p>
             <hr>
+            {% if user.profile %}
             <a href="/update_user_profile/{{ user.profile.pk }}" class="btn btn-outline-secondary">
                 Редактировать
             </a>
+            {% else %}
+            <a href="/profile-create/{{ user.profile.pk }}" class="btn btn-outline-secondary">
+                Редактировать
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>
