@@ -79,6 +79,7 @@ def publishers_list(request):
     data = {
         'publishers': publishers,
         'book_publisher': book_publisher,
+        'user': request.user,
     }
     if request.user.is_authenticated:
         data['username'] = request.user.username
